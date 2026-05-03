@@ -1,6 +1,6 @@
 
-import  { useState, useEffect, useCallback } from "react";
-import {  Info, Globe, Birdhouse } from "lucide-react";
+import { useState, useEffect, useCallback } from "react";
+import { Info, Globe, Birdhouse } from "lucide-react";
 import { FaGithub as Github } from "react-icons/fa";
 import {
   Menubar,
@@ -10,14 +10,12 @@ import {
   MenubarSeparator,
   MenubarShortcut,
   MenubarTrigger,
-  MenubarSub,
-  MenubarSubContent,
-  MenubarSubTrigger,
 } from "@/components/ui/menubar";
 import { motion } from "framer-motion";
 import { ExchangeRate } from "@/components/exchange-rate";
 import { cn, formatShortcut } from "@/lib/utils";
 import { AppId, SettingsTab, APP_ITEMS, SETTINGS_APP } from "@/lib/constants";
+import { GITHUB_URL } from "@/constants";
 
 type MenuBarProps = {
   openApp: (appId: AppId) => void;
@@ -103,7 +101,7 @@ export function MenuBar({
   }, [handleKeyPress]);
 
   const openGitHub = useCallback(() => {
-    window.open("https://github.com/am-v", "_blank");
+    window.open(GITHUB_URL, "_blank");
   }, []);
 
   return (
@@ -210,7 +208,7 @@ export function MenuBar({
                   "cursor-pointer rounded-sm",
                   "hover:bg-accent/50 focus:bg-accent focus:text-accent-foreground",
                   activeApps.includes(SETTINGS_APP.id) &&
-                    "text-primary font-medium"
+                  "text-primary font-medium"
                 )}
               >
                 <div className="flex items-center gap-2">
@@ -243,19 +241,6 @@ export function MenuBar({
                 </div>
               </MenubarItem>
 
-              <MenubarItem
-                onClick={() =>
-                  window.open("https://amv.im/", "_blank")
-                }
-                className="text-xs focus:bg-accent focus:text-accent-foreground hover:bg-accent/50 cursor-pointer px-2 py-1.5 rounded-sm"
-              >
-                <div className="flex items-center gap-2">
-                  <span className="h-4 w-4 text-primary/70 group-hover:text-primary">
-                    <Globe className="h-4 w-4" />
-                  </span>
-                  <span>My Portfolio</span>
-                </div>
-              </MenubarItem>
 
               {/* About */}
               <MenubarItem
