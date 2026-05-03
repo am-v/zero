@@ -22,6 +22,7 @@ import {
 } from "@/lib/constants";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "@/components/theme-provider";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 type DockProps = {
   openApp: (appId: AppId) => void;
@@ -246,6 +247,7 @@ export function Dock({
   const dockRef = useRef<HTMLDivElement>(null);
   const { theme } = useTheme();
   const isLightTheme = theme === "light";
+  const isMobile = useIsMobile();
 
   // Track mouse position for magnification effect
   const handleMouseMove = useCallback((e: React.MouseEvent) => {
@@ -287,6 +289,93 @@ export function Dock({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [openApp, openSettings, openSettingsTab]);
 
+  const handleAppClick = useCallback(
+    (app: AppMenuItem) => {
+      if (app.id === SETTINGS_APP.id) {
+        if (openSettingsTab) {
+          openSettingsTab("general");
+        } else {
+          openSettings();
+        }
+      } else {
+        openApp(app.id);
+      }
+    },
+    [openApp, openSettings, openSettingsTab]
+  );
+
+  // ── Mobile dock ──────────────────────────────────────────────────────────
+  if (isMobile) {
+    return (
+      <div
+        className="fixed bottom-0 left-0 right-0 flex justify-center items-center"
+        style={{ zIndex: 9000 }}
+      >
+        <motion.div
+          className={cn(
+            "w-full px-2 py-1.5 border-t backdrop-blur-xl",
+            isLightTheme
+              ? "bg-background/80 border-border/30"
+              : "bg-background/80 border-border/30"
+          )}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ type: "spring", stiffness: 400, damping: 25, delay: 0.3 }}
+        >
+          {/* Scrollable icon row */}
+          <div
+            className="flex items-center gap-1 overflow-x-auto scrollbar-none"
+            style={{ scrollbarWidth: "none" }}
+          >
+            <TooltipProvider>
+              {DOCK_APPS.map((app, index) => {
+                const isActive = activeApps.includes(app.id);
+                const isMinimized = minimizedApps.has(app.id);
+                return (
+                  <motion.button
+                    key={app.id}
+                    onClick={() => handleAppClick(app)}
+                    className={cn(
+                      "relative flex-shrink-0 flex flex-col items-center justify-center gap-0.5",
+                      "w-14 h-14 rounded-xl transition-colors",
+                      isLightTheme
+                        ? "bg-white/70 border border-gray-200/30"
+                        : "bg-zinc-800/70 border border-zinc-700/30",
+                      isActive && "ring-1 ring-primary/50",
+                      isMinimized && "opacity-60"
+                    )}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{
+                      opacity: 1,
+                      y: 0,
+                      transition: {
+                        delay: 0.03 * index,
+                        type: "spring",
+                        stiffness: 400,
+                        damping: 25,
+                      },
+                    }}
+                    whileTap={{ scale: 0.88 }}
+                    aria-label={app.label}
+                  >
+                    <span className="text-foreground flex items-center justify-center">
+                      {app.icon}
+                    </span>
+                    {/* Active indicator dot */}
+                    {isActive && (
+                      <span className="absolute bottom-1 h-1 w-1 rounded-full bg-primary" />
+                    )}
+                  </motion.button>
+                );
+              })}
+            </TooltipProvider>
+          </div>
+        </motion.div>
+      </div>
+    );
+  }
+
+  // ── Desktop dock ─────────────────────────────────────────────────────────
   return (
     <div
       className="fixed bottom-6 left-0 right-0 flex justify-center items-center"
@@ -326,17 +415,7 @@ export function Dock({
                 mouseX={mouseX}
                 index={index}
                 totalItems={DOCK_APPS.length}
-                onClick={() => {
-                  if (app.id === SETTINGS_APP.id) {
-                    if (openSettingsTab) {
-                      openSettingsTab("general");
-                    } else {
-                      openSettings();
-                    }
-                  } else {
-                    openApp(app.id);
-                  }
-                }}
+                onClick={() => handleAppClick(app)}
               />
             ))}
           </motion.div>

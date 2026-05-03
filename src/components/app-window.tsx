@@ -11,6 +11,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { X, Minus, Plus } from "lucide-react";
 import { throttle } from "lodash";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const MIN_WINDOW_SIZE = {
   width: 300,
@@ -270,9 +271,9 @@ function AppWindow({
     );
     const maxY = Math.max(
       window.innerHeight -
-        DOCK_HEIGHT -
-        MIN_WINDOW_SIZE.height -
-        TOTAL_VERTICAL_PADDING,
+      DOCK_HEIGHT -
+      MIN_WINDOW_SIZE.height -
+      TOTAL_VERTICAL_PADDING,
       minY
     );
 
@@ -296,9 +297,9 @@ function AppWindow({
       y = Math.max(
         minY,
         window.innerHeight -
-          DOCK_HEIGHT -
-          validatedSize.height -
-          TOTAL_VERTICAL_PADDING
+        DOCK_HEIGHT -
+        validatedSize.height -
+        TOTAL_VERTICAL_PADDING
       );
     }
 
@@ -640,6 +641,70 @@ function AppWindow({
     handleMaximize();
   }, [handleMaximize]);
 
+  const isMobile = useIsMobile();
+
+  if (isMobile) {
+    // On mobile: full-screen modal panel between menu bar and dock
+    return (
+      <AnimatePresence>
+        {!isMinimized && (
+          <motion.div
+            key={id}
+            className="fixed left-0 right-0 overflow-hidden shadow-xl outline-none"
+            style={{
+              top: MENU_BAR_HEIGHT,
+              bottom: DOCK_HEIGHT,
+              zIndex: 8000 + zIndex,
+              touchAction: "pan-y",
+            }}
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0, transition: { type: "spring", damping: 22, stiffness: 300 } }}
+            exit={{ opacity: 0, y: 40, transition: { duration: 0.18 } }}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby={`window-title-${id}`}
+          >
+            <Card className="flex flex-col h-full overflow-hidden outline-none ring-0 border-0 rounded-none">
+              {/* Mobile title bar */}
+              <CardHeader className="p-0 space-y-0 select-none flex flex-row items-center justify-between border-b border-zinc-100/20 dark:border-zinc-800/20">
+                <div className="flex-1 flex items-center justify-between px-4 py-2">
+                  {/* Close button on left */}
+                  <button
+                    onClick={onClose}
+                    className="h-6 w-6 flex items-center justify-center rounded-full bg-destructive/70 hover:bg-destructive transition-colors"
+                    aria-label="Close"
+                  >
+                    <X size={12} className="text-white" />
+                  </button>
+
+                  <h2
+                    id={`window-title-${id}`}
+                    className="text-sm font-semibold text-center flex-1 mx-2"
+                  >
+                    {title}
+                  </h2>
+
+                  {/* Minimize button on right */}
+                  <button
+                    onClick={handleMinimize}
+                    className="h-6 w-6 flex items-center justify-center rounded-full bg-amber-400/70 hover:bg-amber-500 transition-colors"
+                    aria-label="Minimize"
+                  >
+                    <Minus size={12} className="text-zinc-800" />
+                  </button>
+                </div>
+              </CardHeader>
+
+              <CardContent className="p-0 flex-1 overflow-auto relative h-full">
+                {children}
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    );
+  }
+
   return (
     <>
       {/* Snap guides - only render when necessary */}
@@ -685,9 +750,8 @@ function AppWindow({
                 ? `calc(100vw - ${TOTAL_VERTICAL_PADDING}px)`
                 : "none",
               maxHeight: windowState.isMaximized
-                ? `calc(100vh - ${
-                    MENU_BAR_HEIGHT + DOCK_HEIGHT + TOTAL_VERTICAL_PADDING
-                  }px)`
+                ? `calc(100vh - ${MENU_BAR_HEIGHT + DOCK_HEIGHT + TOTAL_VERTICAL_PADDING
+                }px)`
                 : "none",
             }}
             initial={{ opacity: 0, scale: 0.95, x: position.x, y: position.y }}

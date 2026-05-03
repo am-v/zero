@@ -1,6 +1,6 @@
 
 import { useState, useEffect, useCallback } from "react";
-import { Info, Globe, Birdhouse } from "lucide-react";
+import { Info, Birdhouse } from "lucide-react";
 import { FaGithub as Github } from "react-icons/fa";
 import {
   Menubar,
@@ -16,6 +16,7 @@ import { ExchangeRate } from "@/components/exchange-rate";
 import { cn, formatShortcut } from "@/lib/utils";
 import { AppId, SettingsTab, APP_ITEMS, SETTINGS_APP } from "@/lib/constants";
 import { GITHUB_URL } from "@/constants";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 type MenuBarProps = {
   openApp: (appId: AppId) => void;
@@ -32,6 +33,7 @@ export function MenuBar({
   activeApps,
   className,
 }: MenuBarProps) {
+  const isMobile = useIsMobile();
   const [dateTime, setDateTime] = useState(() => {
     const now = new Date();
     const weekday = now.toLocaleDateString([], { weekday: "short" });
@@ -141,7 +143,7 @@ export function MenuBar({
                 onClick={() => openApp("todo")}
               >
                 Tasks
-                <MenubarShortcut>{formatShortcut("1")}</MenubarShortcut>
+                {!isMobile && <MenubarShortcut>{formatShortcut("1")}</MenubarShortcut>}
               </MenubarItem>
 
               {/* Kanban */}
@@ -150,7 +152,7 @@ export function MenuBar({
                 onClick={() => openApp("kanban")}
               >
                 Kanban
-                <MenubarShortcut>{formatShortcut("2")}</MenubarShortcut>
+                {!isMobile && <MenubarShortcut>{formatShortcut("2")}</MenubarShortcut>}
               </MenubarItem>
 
               {/* Habit Tracker */}
@@ -159,7 +161,7 @@ export function MenuBar({
                 onClick={() => openApp("habit")}
               >
                 Habit Tracker
-                <MenubarShortcut>{formatShortcut("3")}</MenubarShortcut>
+                {!isMobile && <MenubarShortcut>{formatShortcut("3")}</MenubarShortcut>}
               </MenubarItem>
 
               {/* Focus Timer */}
@@ -168,7 +170,7 @@ export function MenuBar({
                 onClick={() => openApp("pomodoro")}
               >
                 Focus Timer
-                <MenubarShortcut>{formatShortcut("4")}</MenubarShortcut>
+                {!isMobile && <MenubarShortcut>{formatShortcut("4")}</MenubarShortcut>}
               </MenubarItem>
 
               {/* Notes */}
@@ -177,7 +179,7 @@ export function MenuBar({
                 onClick={() => openApp("notepad")}
               >
                 Notes
-                <MenubarShortcut>{formatShortcut("5")}</MenubarShortcut>
+                {!isMobile && <MenubarShortcut>{formatShortcut("5")}</MenubarShortcut>}
               </MenubarItem>
 
               {/* Ambient Sounds */}
@@ -186,7 +188,7 @@ export function MenuBar({
                 onClick={() => openApp("ambient")}
               >
                 Ambient Sounds
-                <MenubarShortcut>{formatShortcut("6")}</MenubarShortcut>
+                {!isMobile && <MenubarShortcut>{formatShortcut("6")}</MenubarShortcut>}
               </MenubarItem>
 
               {/* YouTube Player */}
@@ -195,7 +197,7 @@ export function MenuBar({
                 onClick={() => openApp("youtube")}
               >
                 YouTube Player
-                <MenubarShortcut>{formatShortcut("7")}</MenubarShortcut>
+                {!isMobile && <MenubarShortcut>{formatShortcut("7")}</MenubarShortcut>}
               </MenubarItem>
 
               <MenubarSeparator />
@@ -219,7 +221,7 @@ export function MenuBar({
                   </span>
                   <span>{SETTINGS_APP.label}</span>
                 </div>
-                {SETTINGS_APP.getShortcutText && (
+                {!isMobile && SETTINGS_APP.getShortcutText && (
                   <MenubarShortcut>
                     {SETTINGS_APP.getShortcutText()}
                   </MenubarShortcut>
@@ -270,7 +272,7 @@ export function MenuBar({
                   </span>
                   <span>About</span>
                 </div>
-                <MenubarShortcut>{formatShortcut("8")}</MenubarShortcut>
+                {!isMobile && <MenubarShortcut>{formatShortcut("8")}</MenubarShortcut>}
               </MenubarItem>
             </MenubarContent>
           </MenubarMenu>
@@ -278,7 +280,8 @@ export function MenuBar({
       </div>
 
       <div className="flex items-center space-x-3">
-        <ExchangeRate />
+        {/* Hide exchange rate on mobile to save horizontal space */}
+        {!isMobile && <ExchangeRate />}
         <span className="text-xs font-medium">{dateTime}</span>
       </div>
     </motion.div>
