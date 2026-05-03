@@ -1,0 +1,1 @@
+export const WALLPAPER_URL = "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhq5Ue-PXc3bhnEdsvriDDyuxZ_QFL9gK8mDV30getPCEI6pc0X2qlyo9U0TPg7YtVB8dQm_M5UHF0wThhX4ECS3h7CBJaZ6y2aG3KW9mYh73xGnLm9njIwLXxUHhadDxKzgvNL4Ye4c1wSBMqtysBNqhck513gYGqJ65vRSCNf-QiEPWlQwN8xKgKhrRpI/s1600/wallpaper.jpg"
